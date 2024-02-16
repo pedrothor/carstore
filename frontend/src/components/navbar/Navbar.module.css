@@ -1,0 +1,50 @@
+
+.navbar {
+    display: flex;
+    position: fixed;
+    background: #0B0B17;
+    height: 45px;
+    padding-bottom: 20px;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+}
+
+.navbar img {
+    display: flex;
+    width: 150px;
+    height: 50px;
+    margin-top: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    position: absolute;
+}
+
+.itemsNavbar {
+    display: flex;
+    justify-content: center; /* Centraliza os itens horizontalmente */
+    align-items: center;
+    margin: 0 auto;
+    color: aliceblue;
+}
+
+.itemsNavbar ul {
+    display: flex;
+    gap: 15px;
+    list-style-type: none;
+    justify-content: center;
+    margin-top: 2em;
+}
+
+.itemsNavbar li h4{
+    font-size: 1.7em;
+    color:#fff;
+    cursor: pointer;
+}
+
+.itemsNavbar li h4:hover {
+    font-size: 1.7em;
+    color:gold;
+}

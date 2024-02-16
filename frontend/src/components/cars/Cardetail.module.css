@@ -1,0 +1,97 @@
+
+.container {
+    display: flex;
+    justify-content: center;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 15%;
+}
+
+.image img{
+    width: 300px;
+    height: 250px;
+    border-radius: 15px;
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+}
+
+.title h2{
+    color: #000;
+    font-size: 2.5em;
+}
+
+.priceArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-direction: column;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 40px;
+    margin-top: 10px;
+    gap: 10px;
+    height: 50px;
+    background-color:rgb(6, 128, 101);
+}
+
+.button h4{
+    font-size: 1.3em;
+    color: #fff;
+}
+
+.listDetail {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.listDetail hr{
+    width: 300px;
+}
+
+.listDetail li {
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    text-align: center;
+    margin-left: 0px;
+}
+
+.dataPrice {
+    display: flex;
+}
+
+.price {
+    display: flex;
+    margin: 0 auto;
+}
+
+.price h1{
+    font-size: 40px;
+    color: rgb(15, 110, 20);
+}
+
+.km {
+    margin-top: 20px;
+}
+
+.chassis {
+    margin-top: 20px;
+}
+
+.store {
+    margin-top: 20px;
+}
+
