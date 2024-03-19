@@ -3,7 +3,7 @@
     text-decoration: none !important;
 }
 
-html, body, .carsPage {
+html, body, #root, .carsPage {
     background: #0B0B17;
 }
 

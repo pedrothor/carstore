@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Cars.module.css'
 import { transformInteger, toTitle } from './script.js';
 import '@radix-ui/themes/styles.css';
 import { Flex, Button, Inset, Text, Dialog, TextField, Select, Heading } from '@radix-ui/themes';
-import { PlusIcon, CheckIcon, Cross2Icon, Pencil2Icon } from '@radix-ui/react-icons'
+import { PlusIcon, CheckIcon, Cross2Icon, Pencil2Icon, MixerHorizontalIcon } from '@radix-ui/react-icons'
 import { Card } from 'react-bootstrap';
 
 
@@ -14,6 +14,29 @@ export default function Cars() {
   const [data, setData] = useState([]);
   const [units, setUnits] = useState([]);
   const navigate = useNavigate();
+  
+  // informações
+  const [image, setImage] = useState(null);
+  const [name, setName] = useState('');
+  const [year, setYear] = useState('');
+  const [color, setColor] = useState('');
+  const [km, setKm] = useState('');
+  const [unit, setUnit] = useState(1);
+  const [chassis, setChassis] = useState('');
+  const [price, setPrice] = useState('');
+
+  // encapsulando o id do hovered item
+  const [hoveredItemId, setHoveredItemId] = useState(null);
+  const endpointUpdateDelete = `http://localhost:8000/cars/${hoveredItemId}/`
+
+  // manipulando o hover de cada card
+  const handleMouseEnter = (itemId) => {
+    setHoveredItemId(itemId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredItemId(null);
+  };
 
   // GET cars
   useEffect(() => {
@@ -26,7 +49,6 @@ export default function Cars() {
       });
   }, []);
 
-
   // GET units
   useEffect(() => {
     axios.get('http://localhost:8000/units')
@@ -34,18 +56,9 @@ export default function Cars() {
       .catch((err) => console.log(`Error: ${err}`))
   }, [])
 
-  // informações para o axios (POST)
-  const [image, setImage] = useState(null);
-  const [name, setName] = useState('');
-  const [year, setYear] = useState('');
-  const [color, setColor] = useState('');
-  const [km, setKm] = useState('');
-  const [unit, setUnit] = useState(1);
-  const [chassis, setChassis] = useState('');
-  const [price, setPrice] = useState('');
 
   // POST
-  const AddCarInfo = async () => {
+  const PostCar = async () => {
     let formField = new FormData()
 
     formField.append('name', name)
@@ -60,10 +73,8 @@ export default function Cars() {
       formField.append('image', image)
     }
 
-
-
     await axios({
-      method: 'post',
+      method: 'POST',
       url: endpoint,
       data: formField
     }).then((resp) => {
@@ -72,95 +83,27 @@ export default function Cars() {
     navigate('/')
   }
 
-  // encapsulando o id do item hovered
-  const [hoveredItemId, setHoveredItemId] = useState(null);
-
-  // manipulando o hover de cada card
-  const handleMouseEnter = (itemId) => {
-    setHoveredItemId(itemId);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredItemId(null);
-  };
-
-  // informações para o axios (PUT)
-  const [imageUpdate, setImageUpdate] = useState(null);
-  const [nameUpdate, setNameUpdate] = useState('');
-  const [yearUpdate, setYearUpdate] = useState('');
-  const [colorUpdate, setColorUpdate] = useState('');
-  const [kmUpdate, setKmUpdate] = useState('');
-  const [unitUpdate, setUnitUpdate] = useState(1);
-  const [chassisUpdate, setChassisUpdate] = useState('');
-  const [priceUpdate, setPriceUpdate] = useState('');
-  const [defaultValues, setDefaultValues] = useState()
-
-  useEffect(() => {
-    if (hoveredItemId !== null) {
-      axios.get('http://localhost:8000/cars/' + hoveredItemId)
-        .then(resp => setDefaultValues(resp.data))
-        .catch(err => console.log(err))
-    }
-  }, [hoveredItemId])
-
+  
   // UPDATE
-  const UpdateInfo = async () => {
+  let formUpdate = new FormData();
 
-    const endpointUpdate = `http://localhost:8000/cars/${hoveredItemId}/`
-    let formUpdate = new FormData();
-    let dictField = {};
-
-    dictField['name'] = nameUpdate
-    dictField['year'] = yearUpdate
-    dictField['color'] = colorUpdate
-    dictField['km'] = kmUpdate
-    dictField['unit'] = unitUpdate
-    dictField['chassis'] = chassisUpdate
-    dictField['price'] = priceUpdate
-    dictField['image'] = imageUpdate
-
-    // precisamos converter a imagem (que é string URL) em File Object para o axios aceitar.
-    const fetchAndCreateFile = async (imageUrl) => {
-      // baixando a imagem com fecth
-      const response = await fetch(imageUrl);
-
-      // pegando os dados da imagem usando o blob
-      const blob = await response.blob();
-
-      // criando um File Object com os dados da imagem (blob)
-      const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
-
-      return file;
-    }
-
-    // encapsulando a imagem (já em File Object) numa constante
-    const imageFile = await fetchAndCreateFile(defaultValues.image);
+  const UpdateCar = async () => {
     
-    // verificando se há algum item vazio (que nao foi modificado) e substituindo pelo default (default é o valor original do campo)
-    Object.keys(dictField).forEach(element => {
-      if (dictField[element] === '' || dictField[element] === null) {
-        // se o element for a imagem, nao faça nada pois ela será adicionada mais a frente
-        if (element === 'image'){
-          return;
-        }
-        dictField[element] = defaultValues[element];
-      }
-    });
-
-    // iterando sobre as chaves e valores de formField e adicionando-as no formUpdate
-    Object.entries(dictField).forEach(([key, value]) => {
-      if(key === 'image'){
-        formUpdate.append('image', imageFile)
-      }
-      formUpdate.append(key, value);
-    });
-
     await axios({
-      method: 'PUT',
-      url: endpointUpdate,
+      method: 'PATCH',
+      url: endpointUpdateDelete,
       data: formUpdate,
     })
-    .catch(err => console.log(err))
+      .catch(err => console.log(err))
+  }
+
+  // DELETE
+
+  const DeleteCar = () => {
+    axios({
+      method: 'DELETE',
+      url: endpointUpdateDelete,
+    })
   }
 
   return (
@@ -169,10 +112,11 @@ export default function Cars() {
         <Heading style={{ color: 'white', marginBottom: 12 }}>Available cars</Heading>
       </div>
 
+      {/* ADD AREA */}
       <Dialog.Root>
         <Dialog.Trigger>
           <Button variant="outline" color="green" style={{ marginLeft: 15, cursor: 'pointer', display: 'flex', margin: '0 auto', color: 'green', }}>
-            <PlusIcon width="16" height="16" style={{ color: 'green' }} /> Add a car
+            <PlusIcon width="16" height="16" style={{ color: 'green' }} /> New Car
           </Button>
         </Dialog.Trigger>
 
@@ -260,7 +204,7 @@ export default function Cars() {
               </Text>
               <TextField.Input
                 defaultValue=""
-                placeholder="Price without cents"
+                placeholder="Type price (numbers only)"
                 maxLength={7}
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
@@ -280,12 +224,13 @@ export default function Cars() {
             </Dialog.Close>
 
             <Dialog.Close asChild>
-              <Button color="green" variant="soft" style={{ cursor: 'pointer' }} type='submit' onClick={AddCarInfo}><CheckIcon></CheckIcon>Save</Button>
+              <Button color="green" variant="soft" style={{ cursor: 'pointer' }} type='submit' onClick={PostCar}><CheckIcon></CheckIcon>Save</Button>
             </Dialog.Close>
           </Flex>
         </Dialog.Content>
       </Dialog.Root>
 
+      {/* CARDS */}
       <Flex justify='center' p='4' wrap='wrap' gap="5">
         {data.map(item => (
           <Card key={item.id} onMouseEnter={() => handleMouseEnter(item.id)} onMouseLeave={handleMouseLeave} style={{ width: 300, position: 'relative' }}>
@@ -316,6 +261,7 @@ export default function Cars() {
 
                   <div style={{ display: 'flex', gap: 20, position: 'absolute', right: '10px', top: '5px' }}>
 
+                    {/* UPDATE AREA */}
                     <Dialog.Root>
                       <Dialog.Trigger asChild>
                         <Pencil2Icon variant='solid' color='white' style={{ cursor: 'pointer' }}></Pencil2Icon>
@@ -335,7 +281,7 @@ export default function Cars() {
                               defaultValue={item.name}
                               placeholder="Enter car name"
                               maxLength={20}
-                              onChange={(e) => setNameUpdate(e.target.value)}
+                              onChange={(e) => formUpdate.append('name', e.target.value)}
                             />
                           </label>
 
@@ -348,7 +294,7 @@ export default function Cars() {
                               defaultValue={item.year}
                               placeholder="Car's year"
                               maxLength={4}
-                              onChange={(e) => setYearUpdate(e.target.value)}
+                              onChange={(e) => formUpdate.append('year', e.target.value)}
                             />
                           </label>
 
@@ -361,7 +307,7 @@ export default function Cars() {
                               defaultValue={item.color}
                               placeholder="Car's color"
                               maxLength={15}
-                              onChange={(e) => setColorUpdate(e.target.value)}
+                              onChange={(e) => formUpdate.append('color', e.target.value)}
                             />
                           </label>
 
@@ -374,11 +320,11 @@ export default function Cars() {
                               defaultValue={item.km}
                               placeholder="Enter value in km"
                               maxLength={7}
-                              onChange={(e) => setKmUpdate(e.target.value)}
+                              onChange={(e) => formUpdate.append('km', e.target.value)}
                             />
                           </label>
 
-                          {/* SELECT */}
+                          {/* UNIT SELECT */}
                           <label>
                             <Text as="div" size="2" mb="1" weight="bold">
                               Unit
@@ -386,13 +332,13 @@ export default function Cars() {
                             <Select.Root>
                               <Select.Trigger placeholder={item.unit_name} />
                               <Select.Content >
-                                  {units.map(element => (
-                                    <div style={{ background: 'transparent' }} id={element.id} onMouseDown={() => setUnitUpdate(document.getElementById(element.id).id)} key={element.id}>
-                                      <Select.Item id={element.id} value={element.id}>
-                                        {element.name}
-                                      </Select.Item>
-                                    </div>
-                                  ))}
+                                {units.map(element => (
+                                  <div style={{ background: 'transparent' }} id={element.id} onMouseDown={() => formUpdate.append('unit_name', document.getElementById(element.id).id)} key={element.id}>
+                                    <Select.Item id={element.id} value={element.id}>
+                                      {element.name}
+                                    </Select.Item>
+                                  </div>
+                                ))}
                               </Select.Content>
                             </Select.Root>
                           </label>
@@ -406,7 +352,7 @@ export default function Cars() {
                               defaultValue={item.chassis}
                               placeholder="Chassis number"
                               maxLength={17}
-                              onChange={(e) => setChassisUpdate(e.target.value)}
+                              onChange={(e) => formUpdate.append('chassis', e.target.value)}
                             />
                           </label>
                           <label>
@@ -418,35 +364,58 @@ export default function Cars() {
                               defaultValue={item.price}
                               placeholder="Price without cents"
                               maxLength={7}
-                              onChange={(e) => setPriceUpdate(e.target.value)}
+                              onChange={(e) => formUpdate.append('price', e.target.value)}
                             />
                           </label>
                           <Text as="div" size="2" weight="bold">
                             Image
                           </Text>
                           <img src={item.image} alt="Car Image" style={{ maxWidth: '70px', maxHeight: '50px', marginBottom: '10px' }} />
-                          <input type="file" id="imageUpdate" onChange={(e) => setImageUpdate(e.target.files[0])} />
+                          <input type="file" id="imageUpdate" onChange={(e) => formUpdate.append('image', e.target.files[0])} />
                         </Flex>
 
                         <Flex gap="3" mt="4" justify="end">
                           <Dialog.Close>
-                            <Button variant="soft" color="gray" style={{ cursor: 'pointer' }}>
+                            <Button variant="outline" color="gray" style={{ cursor: 'pointer' }}>
                               <Cross2Icon></Cross2Icon> Cancel
                             </Button>
                           </Dialog.Close>
 
                           <Dialog.Close asChild>
-                            <Button color="green" variant="soft" style={{ cursor: 'pointer' }} type='submit' onClick={UpdateInfo}><CheckIcon></CheckIcon>Update</Button>
+                            <Button color="green" variant="soft" style={{ cursor: 'pointer' }} type='submit' onClick={UpdateCar}><CheckIcon></CheckIcon>Update</Button>
                           </Dialog.Close>
                         </Flex>
                       </Dialog.Content>
                     </Dialog.Root>
-                    <Cross2Icon color='white' style={{ cursor: 'pointer' }}></Cross2Icon>
+
+                    {/* DELETE AREA */}
+                    <Dialog.Root>
+                      <Dialog.Trigger>
+                        <Cross2Icon color='white' style={{ cursor: 'pointer' }}></Cross2Icon>
+                      </Dialog.Trigger>
+
+                      <Dialog.Content style={{ maxWidth: 450, display: 'flex', alignItems: 'center', textAlign: 'center', flexDirection: 'column' }}>
+                        <Dialog.Title>Delete car</Dialog.Title>
+                        <Dialog.Description size="2" mb="4">
+                          Are you sure want to delete '{toTitle(item.name)}' from the portfolio?
+                        </Dialog.Description>
+                        <Flex gap="3" mt="4" justify="end">
+                          <Dialog.Close>
+                            <Button variant="outline" color="gray">
+                              Cancel
+                            </Button>
+                          </Dialog.Close>
+                          <Dialog.Close>
+                            <Button variant='solid' color='red' onClick={DeleteCar}>Delete</Button>
+                          </Dialog.Close>
+                        </Flex>
+                      </Dialog.Content>
+                    </Dialog.Root>
                   </div>
                 </div>
               )}
 
-              {/* IMAGEM */}
+              {/* IMAGE */}
               <img
                 src={item.image}
                 alt={item.name}
