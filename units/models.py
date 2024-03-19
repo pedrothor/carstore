@@ -4,7 +4,7 @@ from django.db import models
 class Unit(models.Model):
     name = models.CharField(max_length=200)
     register = models.IntegerField()
-    description = models.TextField()
+    description = models.TextField(blank=False, null=False)
     founded_at = models.DateField()
     address = models.CharField(max_length=200)
     city = models.CharField(max_length=100)
@@ -12,7 +12,7 @@ class Unit(models.Model):
     email = models.EmailField()
     phone_number = models.CharField(max_length=20)
     person_responsible = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    active = models.CharField(max_length=20)
     image = models.ImageField(upload_to='units')
 
     def __str__(self):
