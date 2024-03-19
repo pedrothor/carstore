@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Employee
-import datetime
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -19,4 +18,4 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     def get_birth_modified(self, obj):
         birth = obj.birth
-        return birth.strftime('%d/%m/%Y')
+        return birth
